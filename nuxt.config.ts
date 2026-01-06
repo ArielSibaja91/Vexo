@@ -12,6 +12,7 @@ export default defineNuxtConfig({
   ],
   css: ['~/assets/css/main.css'],
   supabase: {
-    redirect: false 
+    redirect: false,
+    types: '~~/app/types/database.types.ts' 
   },
 })
