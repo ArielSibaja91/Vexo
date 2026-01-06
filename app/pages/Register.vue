@@ -3,7 +3,6 @@ import { z } from 'zod'
 
 const supabase = useSupabaseClient()
 const loading = ref(false)
-
 // Simple validation schema
 const schema = z.object({
     businessName: z.string().min(3, 'El nombre del negocio es muy corto'),
@@ -18,19 +17,32 @@ const state = reactive({
 })
 
 async function onSubmit() {
-    loading.value = true
+    const result = schema.safeParse(state);
+
+    if (!result.success) {
+        const firstIssue = result.error.issues?.[0];
+        alert(firstIssue?.message || 'Validation error');
+        return;
+    }
+    loading.value = true;
 
     try {
+        schema.parse({
+            businessName: state.businessName,
+            email: state.email,
+            password: state.password
+        });
+
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email: state.email,
             password: state.password,
-        })
+        });
 
-        if (authError) throw authError
+        if (authError) throw authError;
 
         await supabase.auth.getSession();
 
-        if (!authData.user) throw new Error('No se pudo crear el usuario')
+        if (!authData.user) throw new Error('User cannot be created')
 
         const slug = state.businessName.toLowerCase().trim().replace(/\s+/g, '-')
 
@@ -43,7 +55,7 @@ async function onSubmit() {
             .select()
             .single()
 
-        if (orgError) throw orgError
+        if (orgError) throw orgError;
 
         const { error: profileError } = await supabase
             .from('profiles')
@@ -52,16 +64,17 @@ async function onSubmit() {
                 organization_id: orgData.id,
                 full_name: 'Administrador',
                 role: 'admin'
-            })
+            });
 
-        if (profileError) throw profileError
+        if (profileError) throw profileError;
 
-        navigateTo('/app/dashboard')
+        navigateTo('/app/dashboard');
 
-    } catch (error: any) {
-        alert(error.message || 'Ocurrió un error inesperado')
+    } catch (error) {
+        const message = getSupabaseErrorMessage(error);
+        alert(message);
     } finally {
-        loading.value = false
+        loading.value = false;
     }
 }
 </script>

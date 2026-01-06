@@ -3,7 +3,6 @@ import { z } from 'zod';
 
 const supabase = useSupabaseClient();
 const loading = ref(false);
-
 // Simple validation schema
 const schema = z.object({
     email: z.email('Email inválido'),
@@ -16,9 +15,21 @@ const state = reactive({
 });
 
 async function onSubmit() {
-    loading.value = true
+    const result = schema.safeParse(state);
+
+    if (!result.success) {
+        const firstIssue = result.error.issues?.[0];
+        alert(firstIssue?.message || 'Validation error');
+        return;
+    }
+    loading.value = true;
 
     try {
+        schema.parse({
+            email: state.email,
+            password: state.password
+        });
+
         const { error } = await supabase.auth.signInWithPassword({
             email: state.email,
             password: state.password,
@@ -26,24 +37,18 @@ async function onSubmit() {
 
         if (error) throw error
 
-    
         await navigateTo('/app')
-
-    } catch (error: any) {
-        const message = error.message === 'Invalid login credentials'
-            ? 'Credenciales incorrectas. Revisa tu email y contraseña.'
-            : error.message
-        alert(message)
+    } catch (error) {
+        alert(getSupabaseErrorMessage(error));
     } finally {
         loading.value = false
     }
 }
-
 // If the user is already logged in, it redirect him to the dashboard
 const user = useSupabaseUser();
 watchEffect(() => {
     if (user.value) {
-        navigateTo('/app/dashboard')
+        navigateTo('/app/dashboard');
     }
 });
 </script>
@@ -60,11 +65,11 @@ watchEffect(() => {
 
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                 <UFormField class="w-full" label="Email" name="email">
-                    <UInput class="w-full" v-model="state.email" type="email" icon="i-heroicons-envelope" color="primary" />
+                    <UInput v-model="state.email" type="email" class="w-full" icon="i-heroicons-envelope" color="primary" />
                 </UFormField>
 
                 <UFormField class="w-full" label="Contraseña" name="password">
-                    <UInput class="w-full" v-model="state.password" type="password" icon="i-heroicons-lock-closed" color="primary" />
+                    <UInput v-model="state.password" type="password" class="w-full" icon="i-heroicons-lock-closed" color="primary" />
                 </UFormField>
 
                 <UButton type="submit" block color="primary" :loading="loading" size="lg">
