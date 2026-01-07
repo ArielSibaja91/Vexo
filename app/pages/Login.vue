@@ -37,7 +37,7 @@ async function onSubmit() {
 
         if (error) throw error
 
-        await navigateTo('/app')
+        await navigateTo('/app/dashboard');
     } catch (error) {
         alert(getSupabaseErrorMessage(error));
     } finally {

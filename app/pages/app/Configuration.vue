@@ -6,6 +6,6 @@ definePageMeta({
 
 <template>
     <div>
-        <h1>Hello dashboard</h1>
+        <h1>Hello configuration</h1>
     </div>
 </template>
