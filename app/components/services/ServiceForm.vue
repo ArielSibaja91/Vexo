@@ -42,23 +42,25 @@ async function onSubmit() {
 
 <template>
     <UForm :state="state" class="space-y-4" @submit="onSubmit">
-        <UFormField label="Nombre del servicio" name="name">
-            <UInput v-model="state.name" placeholder="Ej. Corte de Cabello" />
-        </UFormField>
-
         <div class="grid grid-cols-2 gap-4">
-            <UFormField label="Precio (₡)" name="price">
-                <UInput v-model="state.price" type="number" />
+            <UFormField label="Nombre del servicio" name="name" size="lg">
+                <UInput v-model="state.name" placeholder="Ej. Corte de Cabello" />
             </UFormField>
 
-            <UFormField label="Duración (minutos)" name="duration_minutes">
+            <UFormField label="Duración (minutos)" name="duration_minutes" size="lg">
                 <USelect v-model="state.duration_minutes" :items="[15, 30, 45, 60, 90, 120]" />
+            </UFormField>
+
+            <UFormField label="Precio en colones (₡)" name="price" size="lg">
+                <UInput v-model="state.price" type="number" />
             </UFormField>
         </div>
 
         <div class="flex justify-end gap-3 pt-4">
             <UButton label="Cancelar" color="error" variant="ghost" @click="$emit('cancel')" />
-            <UButton type="submit" :label="isEditing ? 'Guardar Cambios' : 'Crear Servicio'" color="primary" :loading="isPending" />
+            <UButton 
+            type="submit" :label="isEditing ? 'Guardar Cambios' : 'Crear Servicio'" color="primary"
+                :loading="isPending" />
         </div>
     </UForm>
 </template>

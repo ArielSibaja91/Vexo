@@ -47,7 +47,7 @@ async function logout() {
                 </UButton>
             </template>
         </UDashboardSidebar>
-        <UContainer class="flex-1 overflow-y-auto py-5">
+        <UContainer class="flex-1 overflow-y-auto">
             <slot />
         </UContainer>
     </UDashboardGroup>

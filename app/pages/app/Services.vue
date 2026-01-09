@@ -5,6 +5,7 @@ definePageMeta({ layout: 'dashboard' });
 
 const { services, loading, fetchServices, deleteService } = useServices();
 const isOpen = ref<boolean>(false);
+const isDeleteOpen = ref<boolean>(false);
 const selectedService = ref<Tables<'services'> | undefined>(undefined);
 
 const handleEdit = (id: string) => {
@@ -18,11 +19,26 @@ const handleNew = () => {
     isOpen.value = true;
 };
 
+const confirmDelete = (id: string) => {
+    selectedService.value = services.value.find(s => s.id === id);
+    isDeleteOpen.value = true;
+};
+
+const handleDelete = async () => {
+    if (!selectedService.value) return;
+    try {
+        await deleteService(selectedService.value.id);
+        isDeleteOpen.value = false;
+    } catch (e) {
+        console.error("No se pudo eliminar", e);
+    }
+};
+
 onMounted(() => fetchServices());
 </script>
 
 <template>
-    <UDashboardPanel class="space-y-6">
+    <UDashboardPanel class="space-y-6 py-5">
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-white">Servicios</h1>
@@ -73,14 +89,15 @@ onMounted(() => fetchServices());
 
                 <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <ServicesServiceCard 
-                    v-for="service in services" 
-                    :key="service.id" 
-                    :service="service"
-                    @delete="deleteService" 
-                    @edit="handleEdit" 
-                    />
+                    v-for="service in services" :key="service.id" :service="service"
+                        @delete="confirmDelete" @edit="handleEdit" />
                 </div>
             </template>
+            <SharedConfirmModal 
+            v-model:open="isDeleteOpen" title="¿Eliminar servicio?"
+                :description="`¿Estás seguro de que deseas eliminar '${selectedService?.name}'? Esta acción es permanente.`"
+                :loading="loading" confirm-label="Eliminar Servicio" :confirm-color="'error'" @confirm="handleDelete"
+                />
         </div>
     </UDashboardPanel>
 </template>
