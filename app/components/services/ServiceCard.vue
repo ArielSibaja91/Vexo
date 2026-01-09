@@ -12,7 +12,7 @@ defineEmits(['delete', 'edit']);
     <UCard class="bg-slate-900 border-slate-800 hover:border-slate-700 transition-colors">
         <div class="flex flex-col gap-2">
             <div class="flex justify-between items-start">
-                <h4 class="font-bold text-white capitalize">{{ service.name }}</h4>
+                <h4 class="font-bold text-white">{{ service.name }}</h4>
                 <UBadge color="primary" variant="subtle" size="lg">₡{{ service.price }}</UBadge>
             </div>
             <div class="flex items-center gap-2 text-slate-400 text-sm">

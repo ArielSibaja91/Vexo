@@ -6,8 +6,10 @@ const loading = ref<boolean>(false);
 export const useServices = () => {
     const client = useSupabaseClient();
 
-    const fetchServices = async () => {
-        if (loading.value) return
+    const fetchServices = async (force: boolean = false) => {
+        if (services.value.length > 0 && !force) {
+            return; 
+        }   
         loading.value = true
         try {
             const { data, error } = await client
@@ -15,18 +17,15 @@ export const useServices = () => {
                 .select('*')
                 .order('name')
             if (error) throw error
-            services.value = data
+            services.value = data || [];
         } finally {
-            loading.value = false
+            loading.value = false;
         }
     }
 
     const createService = async (payload: Omit<TablesInsert<'services'>, 'organization_id' | 'id' | 'created_at'>) => {
         const { data: { session } } = await client.auth.getSession()
         const userId = session?.user?.id
-        // Debuggin
-        console.log('Sesión Supabase:', session)
-        console.log('User ID:', userId)
 
         if (!userId) {
             throw new Error('Sesión invalida.')
@@ -54,7 +53,7 @@ export const useServices = () => {
 
         if (error) throw error
 
-        await fetchServices()
+        await fetchServices();
         return data
     }
 
@@ -89,7 +88,6 @@ export const useServices = () => {
 
             if (error) throw error
 
-            // Actualizamos el estado local sin recargar todo de la DB
             const index = services.value.findIndex(s => s.id === id)
             if (index !== -1) {
                 services.value[index] = data
