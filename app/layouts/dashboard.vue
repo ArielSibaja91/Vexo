@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
 
+const { fetchProfile } = useProfile();
+
 const items: NavigationMenuItem[][] = [[{
     label: 'Inicio',
     icon: 'i-lucide-chart-no-axes-combined',
@@ -14,6 +16,10 @@ const items: NavigationMenuItem[][] = [[{
     icon: 'i-lucide-hand-coins',
     to: '/app/services',
 }, {
+    label: 'Clientes',
+    icon: 'i-lucide-hand-coins',
+    to: '/app/clients',
+}, {
     label: 'Ajustes',
     icon: 'i-lucide-settings',
     to: '/app/configuration'
@@ -25,6 +31,11 @@ async function logout() {
     await supabase.auth.signOut();
     navigateTo('/login');
 };
+
+onMounted(async () => {
+    // Usamos await para bloquear la carga de clientes hasta tener el perfil
+    await fetchProfile(); 
+})
 </script>
 
 <template>

@@ -17,7 +17,7 @@ const emit = defineEmits(['update:open', 'confirm'])
             <UCard class="bg-slate-900 border-slate-800">
                 <template #header>
                     <div class="flex items-center gap-3">
-                        <div class="p-2 bg-slate-800 rounded-lg">
+                        <div class="p-2.5 bg-slate-800 rounded-lg flex justify-center items-center">
                             <UIcon name="i-lucide-alert-triangle" class="size-5 text-error" />
                         </div>
                         <h3 class="text-base font-semibold text-white">{{ title }}</h3>
