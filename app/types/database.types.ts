@@ -147,21 +147,30 @@ export type Database = {
       }
       organizations: {
         Row: {
+          address: string | null
           created_at: string | null
           id: string
+          logo_url: string | null
           name: string
+          phone: string | null
           slug: string
         }
         Insert: {
+          address?: string | null
           created_at?: string | null
           id?: string
+          logo_url?: string | null
           name: string
+          phone?: string | null
           slug: string
         }
         Update: {
+          address?: string | null
           created_at?: string | null
           id?: string
+          logo_url?: string | null
           name?: string
+          phone?: string | null
           slug?: string
         }
         Relationships: []
