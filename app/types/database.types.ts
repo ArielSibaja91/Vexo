@@ -69,6 +69,47 @@ export type Database = {
           },
         ]
       }
+      business_hours: {
+        Row: {
+          break_end: string | null
+          break_start: string | null
+          close_time: string
+          day_of_week: number
+          id: string
+          is_enabled: boolean | null
+          open_time: string
+          organization_id: string | null
+        }
+        Insert: {
+          break_end?: string | null
+          break_start?: string | null
+          close_time: string
+          day_of_week: number
+          id?: string
+          is_enabled?: boolean | null
+          open_time: string
+          organization_id?: string | null
+        }
+        Update: {
+          break_end?: string | null
+          break_start?: string | null
+          close_time?: string
+          day_of_week?: number
+          id?: string
+          is_enabled?: boolean | null
+          open_time?: string
+          organization_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_hours_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           created_at: string | null

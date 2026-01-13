@@ -17,7 +17,7 @@ const items: NavigationMenuItem[][] = [[{
     to: '/app/services',
 }, {
     label: 'Clientes',
-    icon: 'i-lucide-hand-coins',
+    icon: 'i-lucide-book-user',
     to: '/app/clients',
 }, {
     label: 'Ajustes',
@@ -33,7 +33,6 @@ async function logout() {
 };
 
 onMounted(async () => {
-    // Usamos await para bloquear la carga de clientes hasta tener el perfil
     await fetchProfile(); 
 })
 </script>
