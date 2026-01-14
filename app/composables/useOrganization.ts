@@ -16,12 +16,12 @@ export const useOrganization = () => {
                 .eq('id', profile.value.organization_id)
                 .single()
 
-            if (error) throw error
-            organization.value = data
-        } catch (e) {
-            console.error('Error al cargar organización:', e)
+            if (error) throw error;
+            organization.value = data;
+        } catch (error) {
+            console.error('Error loading organization:', error);
         } finally {
-            loading.value = false
+            loading.value = false;
         }
     }
 
@@ -35,11 +35,10 @@ export const useOrganization = () => {
                 .select()
                 .single()
 
-            if (error) throw error
-            organization.value = data
-        } catch (e) {
-            console.error('Error al actualizar:', e)
-            throw e
+            if (error) throw error;
+            organization.value = data;
+        } catch (error) {
+            console.error('Error updating:', error);
         }
     }
 
