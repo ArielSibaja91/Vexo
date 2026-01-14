@@ -6,9 +6,12 @@ export const useAppointments = () => {
 
     const appointments = useState<Tables<'appointments'>[]>('appointments-list', () => []);
     const loading = useState<boolean>('appointments-loading', () => false);
+    const lastFetchedDate = useState<string | null>('last-fetched-date', () => null);
 
-    const fetchAppointments = async (start: string, end: string) => {
+    const fetchAppointments = async (start: string, end: string, force: boolean = false) => {
         if (!profile.value?.organization_id) return;
+
+        if (!force && lastFetchedDate.value === start) return;
 
         loading.value = true
         try {
@@ -26,10 +29,11 @@ export const useAppointments = () => {
 
             if (error) throw error
             appointments.value = data || [];
-        } catch (e) {
-            console.error('Error fetching appointments:', e)
+            lastFetchedDate.value = start;
+        } catch (error) {
+            console.error('Error fetching appointments:', error);
         } finally {
-            loading.value = false
+            loading.value = false;
         }
     }
 
@@ -40,7 +44,8 @@ export const useAppointments = () => {
             .select()
             .single()
 
-        if (error) throw error
+        if (error) throw error;
+        lastFetchedDate.value = null;
         appointments.value.push(data);
         return data
     }

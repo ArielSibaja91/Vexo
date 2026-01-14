@@ -15,7 +15,8 @@ const { fetchHours } = useBusinessHours()
 
 const appointmentsExtended = computed(() => appointments.value as unknown as AppointmentWithDetails[]);
 
-const selectedDate = ref(new Date())
+const selectedDate = ref(new Date());
+const isFormOpen = ref(false);
 
 const loadData = async () => {
     const start = startOfDay(selectedDate.value).toISOString()
@@ -64,7 +65,7 @@ const prevDay = () => { selectedDate.value = subDays(selectedDate.value, 1) }
                 class="flex flex-col items-center justify-center h-64 text-center">
                 <UIcon name="i-lucide-calendar-x" class="w-12 h-12 text-slate-600 mb-2" />
                 <p class="text-slate-400">No hay citas para este día</p>
-                <UButton label="Agendar Cita" variant="link" color="primary" class="mt-2" />
+                <UButton label="Agendar Cita" variant="link" color="primary" class="mt-2" @click="isFormOpen = true" />
             </div>
 
             <div v-else class="space-y-3">
@@ -78,17 +79,17 @@ const prevDay = () => { selectedDate.value = subDays(selectedDate.value, 1) }
                             {{ format(new Date(apt.start_time), 'HH:mm') }}
                         </span>
                         <span class="text-slate-500 text-[10px] uppercase font-bold">
-                            {{ (apt.services as any)?.duration }} min
+                            {{ (apt.services as any)?.duration_minutes }} min
                         </span>
                     </div>
 
                     <div class="flex-1 border-l border-slate-800 pl-4">
-                        <h4 class="text-white font-semibold truncate">{{ (apt.clients as any)?.name }}</h4>
+                        <h4 class="text-white font-semibold truncate">{{ (apt.clients)?.full_name }}</h4>
                         <div class="flex items-center gap-2 mt-1">
                             <UBadge size="xs" variant="subtle" color="primary">
-                                {{ (apt.services as any)?.name }}
+                                {{ (apt.services)?.name }}
                             </UBadge>
-                            <span class="text-slate-500 text-xs">${{ (apt.services as any)?.price }}</span>
+                            <span class="text-slate-500 text-xs">${{ (apt.services)?.price }}</span>
                         </div>
                     </div>
 
@@ -100,7 +101,26 @@ const prevDay = () => { selectedDate.value = subDays(selectedDate.value, 1) }
         <div class="fixed bottom-6 right-6">
             <UButton 
             icon="i-lucide-plus" size="xl" color="primary"
-                class="rounded-full shadow-2xl h-14 w-14 flex items-center justify-center" />
+                class="rounded-full shadow-2xl h-14 w-14 flex items-center justify-center" @click="isFormOpen = true" />
         </div>
+
+        <UModal v-model:open="isFormOpen">
+            <template #content>
+                <UCard class="bg-slate-900 border-slate-800">
+                    <template #header>
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base font-semibold text-white">
+                                Agendar Nueva Cita
+                            </h3>
+                            <UButton color="neutral" variant="ghost" icon="i-lucide-x" @click="isFormOpen = false" />
+                        </div>
+                    </template>
+
+                    <AgendaAppointmentForm 
+                    :initial-date="selectedDate"
+                        @saved="async () => { await loadData(); isFormOpen = false; }" @close="isFormOpen = false" />
+                </UCard>
+            </template>
+        </UModal>
     </UDashboardPanel>
 </template>
