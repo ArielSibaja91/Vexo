@@ -1,24 +1,28 @@
 <script setup lang="ts">
 import { addMinutes, parseISO, format } from 'date-fns'
-import type { TablesInsert } from '~/types/database.helper'
+import type { Tables, TablesInsert } from '~/types/database.helper'
 
 const props = defineProps<{
-    initialDate?: Date
-}>()
+    initialDate?: Date,
+    initialData?: Tables<'appointments'>
+}>();
 
 const emit = defineEmits(['close', 'saved'])
-const { createAppointment } = useAppointments()
+const { createAppointment, updateAppointment } = useAppointments()
 const { clients, fetchClients } = useClients()
 const { services, fetchServices } = useServices()
 const { profile } = useProfile()
 
-const isPending = ref(false)
+const isPending = ref(false);
+const isEditing = computed(() => !!props.initialData);
 
 const state = reactive({
-    client_id: undefined,
-    service_id: undefined,
-    start_time: format(props.initialDate || new Date(), "yyyy-MM-dd'T'HH:mm"),
-    notes: ''
+    client_id: props.initialData?.client_id || undefined,
+    service_id: props.initialData?.service_id || undefined,
+    start_time: props.initialData 
+        ? format(new Date(props.initialData.start_time), "yyyy-MM-dd'T'HH:mm")
+        : format(props.initialDate || new Date(), "yyyy-MM-dd'T'HH:mm"),
+    notes: props.initialData?.notes || ''
 })
 
 onMounted(() => {
@@ -45,13 +49,18 @@ async function onSubmit() {
             start_time: start.toISOString(),
             end_time: end.toISOString(),
             notes: state.notes,
-            status: 'pending'
+            status: props.initialData?.status || 'pending'
         }
 
-        await createAppointment(payload)
+        if (isEditing.value && props.initialData) {
+            await updateAppointment(props.initialData.id, payload)
+        } else {
+            await createAppointment(payload)
+        }
+        
         emit('saved')
     } catch (error) {
-        console.error('Error:', error)
+        console.error('Error processing appointment:', error)
     } finally {
         isPending.value = false
     }
@@ -95,7 +104,7 @@ async function onSubmit() {
             <UButton label="Cancelar" color="error" variant="ghost" @click="$emit('close')" />
             <UButton 
                 type="submit" 
-                label="Guardar Cita" 
+                :label="isEditing ? 'Guardar Cambios' : 'Agendar Cita'" 
                 color="primary" 
                 :loading="isPending" 
             />

@@ -1,4 +1,4 @@
-import type { Tables, TablesInsert } from '~/types/database.helper'
+import type { Tables, TablesInsert, TablesUpdate, TableId } from '~/types/database.helper'
 
 export const useAppointments = () => {
     const supabase = useSupabaseClient();
@@ -50,5 +50,28 @@ export const useAppointments = () => {
         return data
     }
 
-    return { appointments, loading, fetchAppointments, createAppointment }
+    const updateAppointment = async (id: TableId<'appointments'>, payload: TablesUpdate<'appointments'>) => {
+        const { data, error } = await supabase
+            .from('appointments')
+            .update(payload)
+            .eq('id', id)
+            .select()
+            .single()
+
+        if (error) throw error
+        lastFetchedDate.value = null
+        return data
+    }
+
+    const deleteAppointment = async (id: TableId<'appointments'>) => {
+        const { error } = await supabase
+            .from('appointments')
+            .delete()
+            .eq('id', id)
+
+        if (error) throw error
+        appointments.value = appointments.value.filter(a => a.id !== id)
+    }
+
+    return { appointments, loading, fetchAppointments, createAppointment, updateAppointment, deleteAppointment }
 }
