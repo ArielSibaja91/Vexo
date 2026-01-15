@@ -6,9 +6,12 @@ export const useOrganization = () => {
     const organization = useState<Tables<'organizations'> | null>('current-org', () => null)
     const loading = useState<boolean>('org-loading', () => false)
 
-    const fetchOrganization = async () => {
-        if (!profile.value?.organization_id) return
-        loading.value = true
+    const fetchOrganization = async (force: boolean = false) => {
+        if (profile.value?.organization_id && !force) return;
+
+        if (!profile.value?.organization_id) return;
+
+        loading.value = true;
         try {
             const { data, error } = await supabase
                 .from('organizations')
