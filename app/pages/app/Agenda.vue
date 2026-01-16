@@ -66,7 +66,7 @@ const dateLabel = computed(() => format(selectedDate.value, "EEEE, d 'de' MMMM",
                 <div v-else class="space-y-3">
                     <AgendaAppointmentCard 
                     v-for="apt in appointmentsExtended" :key="apt.id" :apt="apt" @edit="openEdit"
-                        @delete="openDelete" />
+                        @delete="openDelete" @refresh="loadData" />
                 </div>
             </template>
         </main>
