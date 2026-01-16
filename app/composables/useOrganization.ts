@@ -7,7 +7,7 @@ export const useOrganization = () => {
     const loading = useState<boolean>('org-loading', () => false)
 
     const fetchOrganization = async (force: boolean = false) => {
-        if (profile.value?.organization_id && !force) return;
+        if (organization.value && !force) return;
 
         if (!profile.value?.organization_id) return;
 
